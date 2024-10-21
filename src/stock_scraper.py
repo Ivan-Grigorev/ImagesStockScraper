@@ -45,7 +45,8 @@ def search_stock(holiday_name):
         if count_tag:
             match = re.search(r'(\d{1,3}(?:[.,]\d{3})*)', count_tag.text)
             if match:
-                image_count = int(match.group(1).replace('.', '').replace(',', ''))
+                matched_string = match.group(1).strip()
+                image_count = int(matched_string.replace('.', '').replace(',', ''))
                 logger.info(f"Holiday: {holiday_name} | Image count: {image_count}")
             else:
                 image_count = 0
