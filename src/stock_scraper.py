@@ -19,6 +19,7 @@ def search_stock(holiday_name):
     Returns:
         image_count (int): The number of images found for the holiday. If no images are found,
                            or an error occurs, returns 0.
+        search_url (str): The URL used to perform the search.
     """
     try:
         # Simulate a search request on Adobe Stock with the holiday name as a query parameter
