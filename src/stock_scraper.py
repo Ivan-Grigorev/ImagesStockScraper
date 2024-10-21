@@ -1,7 +1,5 @@
 """Scrapes a stock image website."""
 
-import re
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -43,14 +41,12 @@ def search_stock(holiday_name):
         count_tag = soup.find('strong', {'class': 'text-sregular grey gravel-text'})
 
         if count_tag:
-            match = re.search(r'(\d{1,3}(?:[.,]\d{3})*)', count_tag.text)
-            if match:
-                matched_string = match.group(1).strip()
-                image_count = int(matched_string.replace('.', '').replace(',', ''))
-                logger.info(f"Holiday: {holiday_name} | Image count: {image_count}")
-            else:
-                image_count = 0
-                logger.warning(f"Could not extract image count for '{holiday_name}'.")
+            image_count = [
+                int(cleaned_num)
+                for num in str(count_tag).split()
+                if (cleaned_num := num.replace('.', '').replace(',', '')).isdigit()
+            ][0]
+            logger.info(f"Holiday: {holiday_name} | Image count: {image_count}")
         else:
             image_count = 0
             logger.warning(f"No image count found on the page for '{holiday_name}'.")
