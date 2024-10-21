@@ -51,16 +51,18 @@ def main():
             )
             sys.exit(1)
 
-        # Initialize an empty list to store image counts
+        # Initialize an empty lists to store image counts and links
         image_counts = []
+        image_links = []
 
-        # Loop through each holiday name and search for image count
         for holiday in all_holiday_data['Holiday Name']:
-            image_count = search_stock(holiday_name=holiday)
+            image_count, search_url = search_stock(holiday_name=holiday)
             image_counts.append(image_count)
+            image_links.append(search_url)
 
-        # Add the image counts to the DataFrame
+        # Add the image counts and links to the DataFrame
         all_holiday_data['Image Count'] = image_counts
+        all_holiday_data['Images URL'] = image_links
 
         # Format current date and time to append to output filename
         current_datetime = datetime.now().strftime('%d-%m-%Y--%H-%M-%S')

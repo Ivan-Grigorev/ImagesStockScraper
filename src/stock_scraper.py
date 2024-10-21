@@ -54,7 +54,7 @@ def search_stock(holiday_name):
             image_count = 0
             logger.warning(f"No image count found on the page for '{holiday_name}'.")
 
-        return image_count
+        return image_count, search_url
 
     except Exception as err:
         logger.error(f"Error occurred while searching for '{holiday_name}': {err}")
