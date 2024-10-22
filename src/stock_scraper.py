@@ -1,5 +1,7 @@
 """Scrapes a stock image website."""
 
+import re
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -33,7 +35,7 @@ def search_stock(holiday_name):
                 f"Failed to retrieve data for {holiday_name}, "
                 f"HTTP status code: {response.status_code}"
             )
-            return 0
+            return 0, search_url
 
         # Parse the HTML content of the page using BeautifulSoup
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -42,12 +44,21 @@ def search_stock(holiday_name):
         count_tag = soup.find('strong', {'class': 'text-sregular grey gravel-text'})
 
         if count_tag:
-            image_count = [
-                int(cleaned_num)
-                for num in str(count_tag).split()
-                if (cleaned_num := num.replace('.', '').replace(',', '')).isdigit()
-            ][0]
-            logger.info(f"Holiday: {holiday_name} | Image count: {image_count}")
+            # Use a regular expression to extract all numeric parts from the text
+            count_text = count_tag.text.strip()
+            match = re.search(r'[\d\u00A0,\.]+', count_text)
+            if match:
+                # Remove non-numeric characters (spaces, commas, dots)
+                image_count_str = re.sub(r'[\s\u00A0,\.]', '', match.group(0))
+                if image_count_str.isdigit():
+                    image_count = int(image_count_str)
+                    logger.info(f"Holiday: {holiday_name} | Image count: {image_count}")
+                else:
+                    image_count = 0
+                    logger.warning(f"Unable to parse image count from the text: {count_text}")
+            else:
+                image_count = 0
+                logger.warning(f"Unable to find numeric value in the text: {count_text}")
         else:
             image_count = 0
             logger.warning(f"No image count found on the page for '{holiday_name}'.")
@@ -56,4 +67,4 @@ def search_stock(holiday_name):
 
     except Exception as err:
         logger.error(f"Error occurred while searching for '{holiday_name}': {err}")
-        return 0
+        return 0, search_url
